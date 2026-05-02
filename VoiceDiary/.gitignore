@@ -73,6 +73,13 @@ google-services.json
 *.db3-shm
 *.db3-wal
 
+## Model files (too large)
+/Resources/Models/*.onnx
+/Resources/Models/*.txt
+/Resources/Models/**/*.onnx
+/Resources/Models/**/*.txt
+/Resources/Models/**/*.wav
+
 ## Temporary files
 *.tmp
 *.temp
