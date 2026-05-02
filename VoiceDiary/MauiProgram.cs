@@ -42,6 +42,7 @@ public static class MauiProgram
         services.AddSingleton<IExportService, ExportService>();
         services.AddSingleton<IBiometricAuthService, BiometricAuthService>();
         services.AddSingleton<ITranscriptionQueueService, TranscriptionQueueService>();
+        services.AddSingleton<ISearchService, SearchService>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)
@@ -51,6 +52,7 @@ public static class MauiProgram
         services.AddTransient<DiaryDetailViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<TrashViewModel>();
+        services.AddTransient<SearchViewModel>();
     }
 
     private static void RegisterPages(IServiceCollection services)
@@ -60,5 +62,6 @@ public static class MauiProgram
         services.AddTransient<DiaryDetailPage>();
         services.AddTransient<SettingsPage>();
         services.AddTransient<TrashPage>();
+        services.AddTransient<SearchPage>();
     }
 }

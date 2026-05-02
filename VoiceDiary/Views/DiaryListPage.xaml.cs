@@ -30,30 +30,40 @@ public partial class DiaryListPage : ContentPage
         ((CollectionView)sender).SelectedItem = null;
     }
 
+    private async void OnSwipeToDelete(object sender, InvokedEventArgs e)
+    {
+        if (e.Parameter is DiaryEntry entry)
+        {
+            var confirm = await DisplayAlert("确认删除", "确定要删除这篇日记吗？", "删除", "取消");
+            if (confirm)
+            {
+                // TODO: 实现删除逻辑
+            }
+        }
+    }
+
     private async void OnThresholdReached(object sender, ItemsViewScrolledEventArgs e)
     {
+        // 无限滚动：当滚动到接近底部时加载更多
         if (e.VerticalOffset > 0 && 
-            e.VerticalOffset > e.ContentSize.Height - e scrollView.Height - 100)
+            e.VerticalOffset > e.ContentSize.Height - e.VerticalOffset - 100)
         {
             await _viewModel.LoadMoreEntriesCommand.ExecuteAsync(null);
         }
     }
 
-    private void OnMenuItemClicked(object sender, MenuItemClickedEventArgs e)
-    {
-        switch (e.Parameter)
-        {
-            case "settings":
-                App.NavigateToSettings();
-                break;
-            case "trash":
-                NavigateToTrash();
-                break;
-        }
-    }
-
-    private async void NavigateToTrash()
+    private async void OnTrashTapped(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new TrashPage(App.Services.GetRequiredService<TrashViewModel>()));
+    }
+
+    private async void OnSettingsTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new SettingsPage(App.Services.GetRequiredService<SettingsViewModel>()));
+    }
+
+    private void OnSearchTapped(object sender, EventArgs e)
+    {
+        Navigation.PushAsync(new SearchPage(App.Services.GetRequiredService<SearchViewModel>()));
     }
 }

@@ -44,11 +44,65 @@ public class DatabaseService : IDatabaseService
 
     private async Task CreateIndexesAsync()
     {
-        await _connection!.ExecuteAsync(@"
-            CREATE INDEX IF NOT IX_DiaryEntry_CreatedAt ON DiaryEntry(CreatedAt);
-            CREATE INDEX IF NOT IX_DiaryEntry_IsDeleted ON DiaryEntry(IsDeleted);
-            CREATE INDEX IF NOT IX_DiaryEntry_IsTranscribed ON DiaryEntry(IsTranscribed);
-            CREATE INDEX IF NOT IX_AudioSegment_EntryId ON AudioSegment(EntryId);
+        var conn = await GetConnectionAsync();
+        
+        await conn.ExecuteAsync(@"
+            CREATE INDEX IF NOT EXISTS IX_DiaryEntry_CreatedAt ON DiaryEntry(CreatedAt);
+            CREATE INDEX IF NOT EXISTS IX_DiaryEntry_IsDeleted ON DiaryEntry(IsDeleted);
+            CREATE INDEX IF NOT EXISTS IX_DiaryEntry_IsTranscribed ON DiaryEntry(IsTranscribed);
+            CREATE INDEX IF NOT EXISTS IX_AudioSegment_EntryId ON AudioSegment(EntryId);
+        ");
+
+        // 创建 FTS5 全文搜索索引
+        await CreateFtsIndexAsync();
+    }
+
+    private async Task CreateFtsIndexAsync()
+    {
+        var conn = await GetConnectionAsync();
+
+        // 创建 FTS5 虚拟表
+        await conn.ExecuteAsync(@"
+            CREATE VIRTUAL TABLE IF NOT EXISTS DiaryEntry_FTS USING fts5(
+                TranscribedText,
+                content='DiaryEntry',
+                content_rowid='rowid',
+                tokenize='unicode61'
+            )
+        ");
+
+        // 创建触发器自动维护索引
+        await conn.ExecuteAsync(@"
+            CREATE TRIGGER IF NOT EXISTS DiaryEntry_AI AFTER INSERT ON DiaryEntry 
+            WHEN NEW.IsTranscribed = 1 AND NEW.IsDeleted = 0
+            BEGIN
+                INSERT OR REPLACE INTO DiaryEntry_FTS(rowid, TranscribedText) 
+                VALUES (NEW.rowid, NEW.TranscribedText);
+            END
+        ");
+
+        await conn.ExecuteAsync(@"
+            CREATE TRIGGER IF NOT EXISTS DiaryEntry_AU AFTER UPDATE ON DiaryEntry 
+            WHEN NEW.IsTranscribed = 1 AND NEW.IsDeleted = 0
+            BEGIN
+                INSERT OR REPLACE INTO DiaryEntry_FTS(rowid, TranscribedText) 
+                VALUES (NEW.rowid, NEW.TranscribedText);
+            END
+        ");
+
+        await conn.ExecuteAsync(@"
+            CREATE TRIGGER IF NOT EXISTS DiaryEntry_AD AFTER DELETE ON DiaryEntry 
+            OR WHEN OLD.IsDeleted = 1
+            BEGIN
+                DELETE FROM DiaryEntry_FTS WHERE rowid = OLD.rowid;
+            END
+        ");
+
+        // 初始化现有数据
+        await conn.ExecuteAsync(@"
+            INSERT OR IGNORE INTO DiaryEntry_FTS(rowid, TranscribedText)
+            SELECT rowid, TranscribedText FROM DiaryEntry 
+            WHERE IsTranscribed = 1 AND IsDeleted = 0
         ");
     }
 
