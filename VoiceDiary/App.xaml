@@ -1,0 +1,5 @@
+namespace VoiceDiary;
+
+public partial class App : Application
+{
+}

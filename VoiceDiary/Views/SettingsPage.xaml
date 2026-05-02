@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.SettingsPage"
+             Title="设置">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <Label Text="🔒 隐私" FontSize="18" FontAttributes="Bold"/>
+            
+            <HorizontalStackLayout>
+                <Label Text="应用锁" VerticalOptions="Center" WidthRequest="150"/>
+                <Switch IsToggled="{Binding BiometricLockEnabled}" HorizontalOptions="EndAndExpand"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout>
+                <Label Text="自动锁定" VerticalOptions="Center" WidthRequest="150"/>
+                <Picker SelectedItem="{Binding AutoLockTime}" 
+                        HorizontalOptions="EndAndExpand"
+                        WidthRequest="150">
+                    <Picker.Items>
+                        <x:String>立即锁定</x:String>
+                        <x:String>30 秒</x:String>
+                        <x:String>1 分钟</x:String>
+                        <x:String>5 分钟</x:String>
+                        <x:String>从不</x:String>
+                    </Picker.Items>
+                </Picker>
+            </HorizontalStackLayout>
+
+            <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
+
+            <Label Text="💾 存储" FontSize="18" FontAttributes="Bold"/>
+            
+            <Label Text="{Binding StorageInfo}" FontSize="14"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="立即备份" 
+                        Command="{Binding BackupCommand}"
+                        BackgroundColor="#007AFF"
+                        WidthRequest="130"/>
+                <Button Text="恢复备份" 
+                        Command="{Binding RestoreBackupCommand}"
+                        BackgroundColor="#5856D6"
+                        WidthRequest="130"/>
+            </HorizontalStackLayout>
+
+            <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
+
+            <Label Text="🎙️ 快捷录音" FontSize="18" FontAttributes="Bold"/>
+            
+            <HorizontalStackLayout>
+                <Label Text="桌面 Widget" VerticalOptions="Center" WidthRequest="150"/>
+                <Switch IsToggled="{Binding DesktopWidgetEnabled}" HorizontalOptions="EndAndExpand"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout>
+                <Label Text="耳机双击触发" VerticalOptions="Center" WidthRequest="150"/>
+                <Switch IsToggled="{Binding HeadphoneTriggerEnabled}" HorizontalOptions="EndAndExpand"/>
+                <Label Text="（取决于平台支持）" 
+                       FontSize="12" 
+                       TextColor="Gray"
+                       VerticalOptions="Center"
+                       Margin="5,0,0,0"/>
+            </HorizontalStackLayout>
+
+            <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
+
+            <Label Text="ℹ️ 关于" FontSize="18" FontAttributes="Bold"/>
+            
+            <HorizontalStackLayout>
+                <Label Text="版本" VerticalOptions="Center" WidthRequest="150"/>
+                <Label Text="v1.0.0" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

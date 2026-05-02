@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.RecordPage"
+             xmlns:viewmodels="clr-namespace:VoiceDiary.ViewModels"
+             x:DataType="viewmodels:RecordViewModel"
+             Title="语音日记">
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="20">
+        <VerticalStackLayout Grid.Row="0" 
+                             HorizontalOptions="Center" 
+                             VerticalOptions="Center"
+                             Spacing="20">
+            
+            <Label Text="{Binding RecordingStatus}"
+                   FontSize="18"
+                   HorizontalOptions="Center"/>
+
+            <Label Text="{Binding RecordingDuration, StringFormat='{0:mm\\:ss\\.ff}'}"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding IsRecording}"/>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1" 
+              HeightRequest="250" 
+              WidthRequest="250"
+              HorizontalOptions="Center"
+              VerticalOptions="Center">
+            
+            <Border StrokeShape="RoundRectangle 125"
+                    Stroke="#CCCCCC"
+                    BackgroundColor="#F0F0F0"
+                    HeightRequest="200"
+                    WidthRequest="200"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+
+            <Border x:Name="RecordButton"
+                    StrokeShape="RoundRectangle 125"
+                    Stroke="#DD0000"
+                    BackgroundColor="#FF0000"
+                    HeightRequest="250"
+                    WidthRequest="250"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                </Border.GestureRecognizers>
+            </Border>
+
+            <BoxView x:Name="LockIndicator"
+                     HeightRequest="80"
+                     WidthRequest="80"
+                     Color="#000000"
+                     Opacity="0.3"
+                     IsVisible="False"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Start"
+                     Margin="0,-180,0,0">
+                <BoxView.Shape>
+                    <RoundRectangle CornerRadius="10"/>
+                </BoxView.Shape>
+            </BoxView>
+
+            <BoxView x:Name="CancelIndicator"
+                     HeightRequest="80"
+                     WidthRequest="80"
+                     Color="#FF0000"
+                     Opacity="0.3"
+                     IsVisible="{Binding IsCancelling}"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Start"
+                     Margin="0,-200,0,0">
+                <BoxView.Shape>
+                    <RoundRectangle CornerRadius="10"/>
+                </BoxView.Shape>
+            </BoxView>
+        </Grid>
+
+        <HorizontalStackLayout Grid.Row="2"
+                               HorizontalOptions="Center"
+                               Spacing="30"
+                               IsVisible="{Binding IsLocked}">
+            
+            <Button Text="❌ 取消"
+                    Clicked="OnCancelButtonClicked"
+                    BackgroundColor="#FF6B6B"
+                    WidthRequest="120"/>
+
+            <Button Text="⏹ 停止"
+                    Clicked="OnStopButtonClicked"
+                    BackgroundColor="#4CAF50"
+                    WidthRequest="120"/>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
