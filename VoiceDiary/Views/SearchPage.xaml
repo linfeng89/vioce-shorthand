@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.SearchPage"
+             Title="搜索">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- 搜索栏 -->
+        <Frame Grid.Row="0" Padding="10" Margin="10" HasShadow="True">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Entry Grid.Column="0"
+                       Text="{Binding SearchQuery, UpdateSourceEventName=TextChanged}"
+                       Placeholder="搜索日记内容..."
+                       x:Name="SearchEntry"
+                       VerticalOptions="Center"/>
+                
+                <Button Grid.Column="1"
+                        Text="搜索"
+                        Command="{Binding SearchCommand}"
+                        BackgroundColor="#007AFF"
+                        TextColor="White"
+                        Padding="20,10"
+                        VerticalOptions="Center"/>
+                
+                <Button Grid.Column="1"
+                        Text="清空"
+                        Command="{Binding ClearSearchCommand}"
+                        BackgroundColor="#8E8E93"
+                        TextColor="White"
+                        Padding="20,10"
+                        VerticalOptions="Center"
+                        IsVisible="{Binding SearchResults.Count, Converter={StaticResource CountToBoolConverter}}"/>
+            </Grid>
+        </Frame>
+
+        <!-- 日期范围筛选（可选） -->
+        <VerticalStackLayout Grid.Row="0" VerticalOptions="End" Margin="10,0,10,60" HorizontalOptions="End">
+            <Button Text="📅 日期范围" 
+                    Clicked="OnDateFilterClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="#007AFF"
+                    BorderColor="#007AFF"
+                    BorderWidth="1"
+                    Padding="15,8"
+                    FontSize="14"/>
+        </VerticalStackLayout>
+
+        <!-- 搜索结果 -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding SearchResults}"
+                        SelectionMode="None"
+                        Margin="10">
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <ContentView>
+                        <Frame Padding="15" Margin="0,5" HasShadow="False">
+                            <VerticalStackLayout Spacing="8">
+                                <HorizontalStackLayout Spacing="10">
+                                    <Label Text="{Binding CreatedAt, StringFormat='{0:MM-dd HH:mm}'}" 
+                                           FontSize="12" 
+                                           TextColor="Gray"/>
+                                    <Label Text="{Binding DurationSeconds, StringFormat='{0:mm\\:ss}'}" 
+                                           FontSize="12" 
+                                           TextColor="Gray"/>
+                                </HorizontalStackLayout>
+                                
+                                <Label FontSize="15"
+                                       LineBreakMode="WordWrap">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding TranscribedText}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </ContentView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                    <Label Text="🔍" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="{Binding SearchHint}" 
+                           FontSize="16" 
+                           TextColor="Gray"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- 加载中指示器 -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsSearching}"
+                           IsVisible="{Binding IsSearching}"
+                           Color="#007AFF"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

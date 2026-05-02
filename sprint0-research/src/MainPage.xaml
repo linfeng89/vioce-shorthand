@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Sprint0.MainPage"
+             Title="Sprint 0 性能测试">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="20"
+            Spacing="15">
+
+            <Label
+                Text="🔬 Sprint 0 技术预研"
+                FontSize="24"
+                FontAttributes="Bold"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Whisper base 性能测试"
+                FontSize="16"
+                TextColor="Gray"
+                HorizontalOptions="Center" />
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <Button
+                Text="① 模型加载测试"
+                Clicked="OnModelLoadTestClicked"
+                BackgroundColor="#007ACC"
+                TextColor="White"
+                CornerRadius="8" />
+
+            <Button
+                Text="② 转写性能测试"
+                Clicked="OnTranscriptionTestClicked"
+                BackgroundColor="#007ACC"
+                TextColor="White"
+                CornerRadius="8" />
+
+            <Button
+                Text="③ 低内存释放测试"
+                Clicked="OnLowMemoryTestClicked"
+                BackgroundColor="#007ACC"
+                TextColor="White"
+                CornerRadius="8" />
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <Label
+                Text="测试结果:"
+                FontSize="18"
+                FontAttributes="Bold" />
+
+            <Border
+                Stroke="LightGray"
+                StrokeShape="RoundRectangle 8"
+                Padding="15"
+                MinimumHeightRequest="300">
+
+                <ScrollView>
+                    <VerticalStackLayout x:Name="ResultsStack" Spacing="10">
+                        <Label Text="点击按钮执行测试..." TextColor="Gray" />
+                    </VerticalStackLayout>
+                </ScrollView>
+
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

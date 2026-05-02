@@ -1,0 +1,88 @@
+# .gitignore
+
+## .NET MAUI
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.app
+*.apk
+*.aab
+*.msix
+*.appx
+*.msixbundle
+*.appxbundle
+
+## User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+*.launchsettings.json
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+nuget/
+packages/
+
+## Rider
+.idea/
+
+## Visual Studio Code
+.settings/
+
+## Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+## macOS
+.DS_Store
+*.dSYM/
+
+## Android
+*.keystore
+google-services.json
+
+## iOS
+*.P12
+*.mobileprovision
+*.IPA*.xcarchive/
+
+## App specific
+/appdata/
+/backup/
+*.db3
+*.db3-shm
+*.db3-wal
+
+## Model files (too large)
+/Resources/Models/*.onnx
+/Resources/Models/*.txt
+/Resources/Models/**/*.onnx
+/Resources/Models/**/*.txt
+/Resources/Models/**/*.wav
+
+## Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
