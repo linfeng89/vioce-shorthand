@@ -4,6 +4,7 @@ public partial class DiaryDetailViewModel : BaseViewModel
 {
     private readonly IStorageService _storageService;
     private readonly IDatabaseService _databaseService;
+    private readonly IAudioPlayer _audioPlayer;
 
     private DiaryEntry? _entry;
     private bool _isPlaying;
@@ -13,10 +14,23 @@ public partial class DiaryDetailViewModel : BaseViewModel
 
     public DiaryDetailViewModel(
         IStorageService storageService,
-        IDatabaseService databaseService)
+        IDatabaseService databaseService,
+        IAudioPlayer audioPlayer)
     {
         _storageService = storageService;
         _databaseService = databaseService;
+        _audioPlayer = audioPlayer;
+
+        _audioPlayer.PlaybackProgressChanged += OnPlaybackProgressChanged;
+        _audioPlayer.PlaybackCompleted += OnPlaybackCompleted;
+        _audioPlayer.PlaybackStopped += OnPlaybackStopped;
+    }
+
+    ~DiaryDetailViewModel()
+    {
+        _audioPlayer.PlaybackProgressChanged -= OnPlaybackProgressChanged;
+        _audioPlayer.PlaybackCompleted -= OnPlaybackCompleted;
+        _audioPlayer.PlaybackStopped -= OnPlaybackStopped;
     }
 
     public DiaryEntry? Entry
@@ -58,14 +72,48 @@ public partial class DiaryDetailViewModel : BaseViewModel
         if (Entry == null)
             return;
 
-        var audioPath = await _storageService.GetAudioFilePathAsync(Entry.AudioFileName);
-        if (!File.Exists(audioPath))
+        try
         {
-            await Shell.Current.DisplayAlert("错误", "音频文件不存在", "确定");
-            return;
-        }
+            var audioPath = await _storageService.GetAudioFilePathAsync(Entry.AudioFileName);
+            if (!File.Exists(audioPath))
+            {
+                await Shell.Current.DisplayAlert("错误", "音频文件不存在", "确定");
+                return;
+            }
 
-        IsPlaying = !IsPlaying;
+            if (IsPlaying)
+            {
+                await _audioPlayer.PauseAsync();
+                IsPlaying = false;
+            }
+            else
+            {
+                await _audioPlayer.LoadAsync(audioPath);
+                await _audioPlayer.PlayAsync();
+                IsPlaying = true;
+                Duration = _audioPlayer.Duration;
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("错误", $"播放失败：{ex.Message}", "确定");
+        }
+    }
+
+    private void OnPlaybackProgressChanged(object? sender, AudioPlaybackEventArgs e)
+    {
+        CurrentPosition = e.CurrentPosition;
+    }
+
+    private void OnPlaybackCompleted(object? sender, AudioPlaybackEventArgs e)
+    {
+        IsPlaying = false;
+        CurrentPosition = TimeSpan.Zero;
+    }
+
+    private void OnPlaybackStopped(object? sender, AudioPlaybackEventArgs e)
+    {
+        IsPlaying = false;
     }
 
     private async Task SaveTextAsync()

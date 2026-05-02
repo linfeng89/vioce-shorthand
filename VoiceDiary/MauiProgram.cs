@@ -34,6 +34,7 @@ public static class MauiProgram
     {
         services.AddSingleton<IDatabaseService, DatabaseService>();
         services.AddSingleton<IAudioRecorder, AudioRecorder>();
+        services.AddSingleton<IAudioPlayer, AudioPlayer>();
         services.AddSingleton<ISpeechRecognizer, WhisperRecognizer>();
         services.AddSingleton<IAudioCompressor, AudioCompressor>();
         services.AddSingleton<IStorageService, StorageService>();
