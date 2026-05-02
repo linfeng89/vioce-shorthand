@@ -40,6 +40,7 @@ public static class MauiProgram
         services.AddSingleton<IBackupService, BackupService>();
         services.AddSingleton<IExportService, ExportService>();
         services.AddSingleton<IBiometricAuthService, BiometricAuthService>();
+        services.AddSingleton<ITranscriptionQueueService, TranscriptionQueueService>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)

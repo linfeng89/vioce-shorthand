@@ -3,7 +3,7 @@ namespace VoiceDiary.ViewModels;
 public class RecordViewModel : BaseViewModel
 {
     private readonly IAudioRecorder _audioRecorder;
-    private readonly ISpeechRecognizer _speechRecognizer;
+    private readonly ITranscriptionQueueService _transcriptionQueue;
     private readonly IDatabaseService _databaseService;
     private readonly IStorageService _storageService;
 
@@ -15,12 +15,12 @@ public class RecordViewModel : BaseViewModel
 
     public RecordViewModel(
         IAudioRecorder audioRecorder,
-        ISpeechRecognizer speechRecognizer,
+        ITranscriptionQueueService transcriptionQueue,
         IDatabaseService databaseService,
         IStorageService storageService)
     {
         _audioRecorder = audioRecorder;
-        _speechRecognizer = speechRecognizer;
+        _transcriptionQueue = transcriptionQueue;
         _databaseService = databaseService;
         _storageService = storageService;
 
@@ -171,30 +171,7 @@ public class RecordViewModel : BaseViewModel
 
     private async Task QueueTranscriptionAsync(DiaryEntry entry)
     {
-        await Task.Run(async () =>
-        {
-            try
-            {
-                if (!_speechRecognizer.IsReady)
-                    await _speechRecognizer.InitializeAsync();
-
-                var audioPath = Path.Combine(_storageService.AppAudioPath, entry.AudioFileName);
-                var text = await _speechRecognizer.RecognizeAsync(audioPath);
-
-                if (!string.IsNullOrEmpty(text))
-                {
-                    entry.TranscribedText = text;
-                    entry.IsTranscribed = true;
-                    await _databaseService.SaveEntryAsync(entry);
-                }
-            }
-            catch (Exception ex)
-            {
-                entry.TranscribeAttempts++;
-                entry.TranscribeError = ex.Message;
-                await _databaseService.SaveEntryAsync(entry);
-            }
-        });
+        await _transcriptionQueue.EnqueueAsync(entry);
     }
 
     public void HandlePanUpdated(float deltaY, float totalY)
