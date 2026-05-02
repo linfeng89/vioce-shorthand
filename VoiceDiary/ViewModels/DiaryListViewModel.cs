@@ -4,6 +4,8 @@ public partial class DiaryListViewModel : BaseViewModel
 {
     private readonly IDatabaseService _databaseService;
     private readonly IStorageService _storageService;
+    private readonly IToastService _toastService;
+    private readonly ITrashService _trashService;
 
     private ObservableCollection<DiaryEntry> _entries = new();
     private bool _isBusy;
@@ -14,10 +16,14 @@ public partial class DiaryListViewModel : BaseViewModel
 
     public DiaryListViewModel(
         IDatabaseService databaseService,
-        IStorageService storageService)
+        IStorageService storageService,
+        IToastService toastService,
+        ITrashService trashService)
     {
         _databaseService = databaseService;
         _storageService = storageService;
+        _toastService = toastService;
+        _trashService = trashService;
     }
 
     public ObservableCollection<DiaryEntry> Entries
@@ -133,6 +139,38 @@ public partial class DiaryListViewModel : BaseViewModel
     {
         await Shell.Current.Navigation.PushAsync(
             new SettingsPage(App.Current.Services.GetRequiredService<SettingsViewModel>()));
+    }
+    
+    public async Task DeleteEntryWithUndoAsync(DiaryEntry entry)
+    {
+        try
+        {
+            // 移动到回收站
+            await _trashService.MoveToTrashAsync(entry);
+            
+            // 从 UI 移除
+            Entries.Remove(entry);
+            UpdateCurrentMonth();
+            
+            // 显示 Toast 带撤销
+            var result = await _toastService.ShowAsync("已删除", "撤销", TimeSpan.FromSeconds(3));
+            
+            if (result == "action")
+            {
+                // 用户点击撤销
+                await _trashService.RestoreFromTrashAsync(entry.Id);
+                
+                // 重新添加到列表（按时间顺序）
+                Entries.Insert(0, entry);
+                UpdateCurrentMonth();
+                
+                await _toastService.Show("已恢复", 2000);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("删除失败", ex.Message, "确定");
+        }
     }
 
     private void UpdateCurrentMonth()

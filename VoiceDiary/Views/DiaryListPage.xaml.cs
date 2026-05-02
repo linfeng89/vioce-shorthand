@@ -34,10 +34,13 @@ public partial class DiaryListPage : ContentPage
     {
         if (e.Parameter is DiaryEntry entry)
         {
-            var confirm = await DisplayAlert("确认删除", "确定要删除这篇日记吗？", "删除", "取消");
-            if (confirm)
+            try
             {
-                // TODO: 实现删除逻辑
+                await _viewModel.DeleteEntryWithUndoAsync(entry);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("删除失败", ex.Message, "确定");
             }
         }
     }

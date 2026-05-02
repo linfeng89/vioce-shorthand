@@ -2,39 +2,43 @@ namespace VoiceDiary.ViewModels;
 
 public partial class TrashViewModel : BaseViewModel
 {
-    private readonly IDatabaseService _databaseService;
-    private readonly IStorageService _storageService;
+    private readonly ITrashService _trashService;
+    private readonly IToastService _toastService;
 
-    private ObservableCollection<DiaryEntry> _deletedEntries = new();
-    private bool _isBusy;
+    private ObservableCollection<DeletedEntry> _trashEntries = new();
+    private bool _isEmpty = true;
+    private bool _hasEntries;
 
-    public TrashViewModel(
-        IDatabaseService databaseService,
-        IStorageService storageService)
+    public TrashViewModel(ITrashService trashService, IToastService toastService)
     {
-        _databaseService = databaseService;
-        _storageService = storageService;
+        _trashService = trashService;
+        _toastService = toastService;
     }
 
-    public ObservableCollection<DiaryEntry> DeletedEntries
+    public ObservableCollection<DeletedEntry> TrashEntries
     {
-        get => _deletedEntries;
-        set => SetProperty(ref _deletedEntries, value);
+        get => _trashEntries;
+        set => SetProperty(ref _trashEntries, value);
     }
 
-    public bool IsBusy
+    public bool IsEmpty
     {
-        get => _isBusy;
-        set => SetProperty(ref _isBusy, value);
+        get => _isEmpty;
+        set => SetProperty(ref _isEmpty, value);
     }
 
-    public Command LoadDeletedEntriesCommand => new Command(async () => await LoadDeletedEntriesAsync());
-    public Command<DiaryEntry> RecoverEntryCommand => new Command<DiaryEntry>(async (entry) => await RecoverEntryAsync(entry));
-    public Command<DiaryEntry> HardDeleteEntryCommand => new Command<DiaryEntry>(async (entry) => await HardDeleteEntryAsync(entry));
-    public Command RecoverAllCommand => new Command(async () => await RecoverAllAsync());
-    public Command DeleteAllCommand => new Command(async () => await DeleteAllAsync());
+    public bool HasEntries
+    {
+        get => _hasEntries;
+        set => SetProperty(ref _hasEntries, value);
+    }
 
-    public async Task LoadDeletedEntriesAsync()
+    public Command LoadTrashEntriesCommand => new Command(async () => await LoadTrashEntriesAsync());
+    public Command<long> RestoreEntryCommand => new Command<long>(async (entryId) => await RestoreEntryAsync(entryId));
+    public Command<long> PermanentlyDeleteCommand => new Command<long>(async (entryId) => await PermanentlyDeleteAsync(entryId));
+    public Command ClearTrashCommand => new Command(async () => await ClearTrashAsync());
+
+    private async Task LoadTrashEntriesAsync()
     {
         if (IsBusy)
             return;
@@ -42,13 +46,17 @@ public partial class TrashViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            DeletedEntries.Clear();
+            TrashEntries.Clear();
 
-            var entries = await _databaseService.GetDeletedEntriesAsync();
+            var entries = await _trashService.GetTrashEntriesAsync(30);
+            
             foreach (var entry in entries)
             {
-                DeletedEntries.Add(entry);
+                TrashEntries.Add(entry);
             }
+
+            IsEmpty = entries.Count == 0;
+            HasEntries = entries.Count > 0;
         }
         catch (Exception ex)
         {
@@ -60,83 +68,86 @@ public partial class TrashViewModel : BaseViewModel
         }
     }
 
-    private async Task RecoverEntryAsync(DiaryEntry entry)
+    private async Task RestoreEntryAsync(long entryId)
     {
-        if (entry == null)
-            return;
-
         try
         {
-            await _databaseService.RecoverEntryAsync(entry);
-            DeletedEntries.Remove(entry);
+            await _trashService.RestoreFromTrashAsync(entryId);
+            
+            // 从列表移除
+            var entry = TrashEntries.FirstOrDefault(e => e.EntryId == entryId);
+            if (entry != null)
+            {
+                TrashEntries.Remove(entry);
+                IsEmpty = TrashEntries.Count == 0;
+                HasEntries = TrashEntries.Count > 0;
+            }
+
+            await _toastService.Show("已恢复", 2000);
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("错误", $"恢复失败：{ex.Message}", "确定");
+            await Shell.Current.DisplayAlert("恢复失败", ex.Message, "确定");
         }
     }
 
-    private async Task HardDeleteEntryAsync(DiaryEntry entry)
+    private async Task PermanentlyDeleteAsync(long entryId)
     {
-        if (entry == null)
-            return;
+        try
+        {
+            await _trashService.PermanentlyDeleteAsync(entryId);
+            
+            // 从列表移除
+            var entry = TrashEntries.FirstOrDefault(e => e.EntryId == entryId);
+            if (entry != null)
+            {
+                TrashEntries.Remove(entry);
+                IsEmpty = TrashEntries.Count == 0;
+                HasEntries = TrashEntries.Count > 0;
+            }
 
-        var confirm = await Shell.Current.DisplayAlert("确认删除", "此操作不可恢复，确定要永久删除吗？", "确定", "取消");
+            await _toastService.Show("已永久删除", 2000);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("删除失败", ex.Message, "确定");
+        }
+    }
+
+    private async Task ClearTrashAsync()
+    {
+        var confirm = await Shell.Current.DisplayAlert(
+            "确认清空回收站", 
+            "此操作将永久删除回收站中的所有内容，确定继续吗？", 
+            "清空", 
+            "取消");
+        
         if (!confirm)
             return;
 
         try
         {
-            var audioPath = Path.Combine(_storageService.AppAudioPath, entry.AudioFileName);
-            if (File.Exists(audioPath))
-                File.Delete(audioPath);
-
-            await _databaseService.HardDeleteEntryAsync(entry);
-            DeletedEntries.Remove(entry);
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("错误", $"删除失败：{ex.Message}", "确定");
-        }
-    }
-
-    private async Task RecoverAllAsync()
-    {
-        try
-        {
-            foreach (var entry in DeletedEntries.ToList())
+            IsBusy = true;
+            
+            var entries = TrashEntries.ToList();
+            foreach (var entry in entries)
             {
-                await _databaseService.RecoverEntryAsync(entry);
+                await _trashService.PermanentlyDeleteAsync(entry.EntryId);
             }
-            DeletedEntries.Clear();
+            
+            TrashEntries.Clear();
+            IsEmpty = true;
+            HasEntries = false;
+
+            await _toastService.Show("回收站已清空", 2000);
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("错误", $"批量恢复失败：{ex.Message}", "确定");
+            await Shell.Current.DisplayAlert("错误", $"清空失败：{ex.Message}", "确定");
         }
-    }
-
-    private async Task DeleteAllAsync()
-    {
-        var confirm = await Shell.Current.DisplayAlert("确认清空", "回收站所有内容将被永久删除，确定吗？", "确定", "取消");
-        if (!confirm)
-            return;
-
-        try
+        finally
         {
-            foreach (var entry in DeletedEntries.ToList())
-            {
-                var audioPath = Path.Combine(_storageService.AppAudioPath, entry.AudioFileName);
-                if (File.Exists(audioPath))
-                    File.Delete(audioPath);
-
-                await _databaseService.HardDeleteEntryAsync(entry);
-            }
-            DeletedEntries.Clear();
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlert("错误", $"批量删除失败：{ex.Message}", "确定");
+            IsBusy = false;
         }
     }
 }

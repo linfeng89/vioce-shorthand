@@ -17,6 +17,11 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            })
+            .ConfigureMauiHandlers(handlers =>
+            {
+                // 注册自定义转换器
+                handlers.AddHandler<ContentView, ContentViewHandler>();
             });
 
 #if DEBUG
@@ -43,6 +48,8 @@ public static class MauiProgram
         services.AddSingleton<IBiometricAuthService, BiometricAuthService>();
         services.AddSingleton<ITranscriptionQueueService, TranscriptionQueueService>();
         services.AddSingleton<ISearchService, SearchService>();
+        services.AddSingleton<IToastService, ToastService>();
+        services.AddSingleton<ITrashService, TrashService>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)

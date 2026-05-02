@@ -42,6 +42,10 @@ public partial class App : Application
 
             var transcriptionQueue = _serviceProvider.GetRequiredService<ITranscriptionQueueService>();
             await transcriptionQueue.StartAsync(_appCts.Token);
+            
+            // 初始化回收站自动清理
+            var trashService = _serviceProvider.GetRequiredService<ITrashService>();
+            await trashService.AutoCleanupAsync(30);
         }
         catch (Exception ex)
         {

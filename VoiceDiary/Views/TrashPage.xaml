@@ -5,58 +5,86 @@
              Title="回收站">
 
     <Grid>
-        <CollectionView ItemsSource="{Binding DeletedEntries}">
+        <!-- 说明文字 -->
+        <Label Grid.Row="0"
+               Text="已删除的日记将在此保留 30 天"
+               FontSize="13"
+               TextColor="#999999"
+               HorizontalOptions="Center"
+               Margin="0,20,0,0"
+               IsVisible="{Binding IsEmpty, Converter={StaticResource InverseBoolConverter}}"/>
+
+        <!-- 回收站列表 -->
+        <CollectionView ItemsSource="{Binding TrashEntries}"
+                        SelectionMode="None"
+                        Margin="10,50,10,10">
+            
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <SwipeView>
                         <SwipeView.RightItems>
                             <SwipeItems>
                                 <SwipeItem Text="恢复" 
-                                           BackgroundColor="Green"
-                                           CommandParameter="{Binding .}"
-                                           Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RecoverEntryCommand}"/>
+                                           BackgroundColor="#4CAF50"
+                                           ForegroundColor="White"
+                                           CommandParameter="{Binding EntryId}"
+                                           Invoked="OnSwipeToRestore"/>
                                 <SwipeItem Text="永久删除" 
-                                           BackgroundColor="Red"
-                                           CommandParameter="{Binding .}"
-                                           Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.HardDeleteEntryCommand}"/>
+                                           BackgroundColor="#F44336"
+                                           ForegroundColor="White"
+                                           CommandParameter="{Binding EntryId}"
+                                           Invoked="OnSwipeToDelete"/>
                             </SwipeItems>
                         </SwipeView.RightItems>
                         
                         <ContentView Padding="15,10">
-                            <VerticalStackLayout Spacing="5">
-                                <Label Text="{Binding TranscribedText}" 
-                                       MaxLines="3"
-                                       LineBreakMode="TailTruncation"
-                                       FontSize="16"/>
-                                <Label Text="{Binding DeletedAt, StringFormat='删除于：{0:MM-dd HH:mm}'}" 
-                                       FontSize="12" 
-                                       TextColor="Gray"/>
-                            </VerticalStackLayout>
+                            <Frame Padding="15" Margin="0,5" HasShadow="False" BorderColor="#FF9800">
+                                <VerticalStackLayout Spacing="8">
+                                    <!-- 删除时间 -->
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="🗑️" FontSize="16"/>
+                                        <Label Text="{Binding DeletedAt, StringFormat='{0:MM-dd HH:mm}'}" 
+                                               FontSize="13" 
+                                               TextColor="#666666"/>
+                                        <Label Text="•" FontSize="13" TextColor="#666666"/>
+                                        <Label Text="{Binding OriginalCreatedAt, StringFormat='{0:MM-dd}'}" 
+                                               FontSize="13" 
+                                               TextColor="#666666"/>
+                                    </HorizontalStackLayout>
+                                    
+                                    <!-- 转写文字 -->
+                                    <Label Text="{Binding TranscribedText}" 
+                                           FontSize="14"
+                                           LineBreakMode="WordWrap"
+                                           MaxLines="2"
+                                           TextColor="#999999"/>
+                                </VerticalStackLayout>
+                            </Frame>
                         </ContentView>
                     </SwipeView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             
             <CollectionView.EmptyView>
-                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
-                    <Label Text="🗑️" FontSize="48" HorizontalOptions="Center"/>
-                    <Label Text="回收站为空" FontSize="16" TextColor="Gray" HorizontalOptions="Center"/>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                    <Label Text="♻️" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="回收站是空的" FontSize="18" TextColor="#666666" HorizontalOptions="Center"/>
+                    <Label Text="删除的日记会显示在这里" FontSize="14" TextColor="#CCCCCC" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
         </CollectionView>
 
-        <VerticalStackLayout HorizontalOptions="Center" 
-                             VerticalOptions="End" 
-                             Spacing="15"
-                             Margin="20">
-            <Button Text="恢复全部" 
-                    Command="{Binding RecoverAllCommand}"
-                    BackgroundColor="#4CAF50"
-                    WidthRequest="200"/>
-            <Button Text="清空回收站" 
-                    Command="{Binding DeleteAllCommand}"
-                    BackgroundColor="#F44336"
-                    WidthRequest="200"/>
-        </VerticalStackLayout>
+        <!-- 底部清理按钮 -->
+        <Button Grid.Row="1"
+                Text="清空回收站"
+               .Command="{Binding ClearTrashCommand}"
+                BackgroundColor="#F44336"
+                TextColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="End"
+                Margin="0,0,0,30"
+                WidthRequest="200"
+                HeightRequest="50"
+                IsVisible="{Binding HasEntries}"/>
     </Grid>
 </ContentPage>
