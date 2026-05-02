@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# sherpa-onnx Whisper 模型下载脚本
+# sherpa-onnx Whisper 模型下载脚本（中文多语言版）
 # 使用方法：./download-model.sh
 
 MODEL_DIR="$(cd "$(dirname "$0")" && pwd)/Resources/Models"
-MODEL_NAME="sherpa-onnx-whisper-base.en"
-MODEL_URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.en.tar.bz2"
+MODEL_NAME="sherpa-onnx-whisper-base"
+MODEL_URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-base.tar.bz2"
 
-echo "开始下载 Whisper base 模型..."
-echo "模型大小：约 150MB"
+echo "开始下载 Whisper base 多语言模型（支持中文）..."
+echo "模型大小：约 300MB（压缩后）"
 echo "下载目录：$MODEL_DIR"
 echo ""
 
@@ -33,12 +33,16 @@ tar -xjf "/tmp/sherpa-model.tar.bz2" -C "$MODEL_DIR"
 rm -f "/tmp/sherpa-model.tar.bz2"
 
 cd "$MODEL_DIR/$MODEL_NAME"
-ln -sf base.en-encoder.onnx encoder.onnx
-ln -sf base.en-decoder.onnx decoder.onnx
-ln -sf base.en-tokens.txt tokens.txt
+ln -sf base-encoder.int8.onnx encoder.onnx
+ln -sf base-decoder.int8.onnx decoder.onnx
+ln -sf base-tokens.txt tokens.txt
 
 echo ""
 echo "✓ 模型下载完成！"
+echo ""
+echo "模型文件："
 ls -lh "$MODEL_DIR/$MODEL_NAME"/*.onnx "$MODEL_DIR/$MODEL_NAME"/*.txt
 echo ""
 echo "模型总大小：$(du -sh "$MODEL_DIR/$MODEL_NAME" | cut -f1)"
+echo ""
+echo "支持的语言：99 种（包括中文、英语、粤语等）"

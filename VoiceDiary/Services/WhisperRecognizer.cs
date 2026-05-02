@@ -55,6 +55,34 @@ public class WhisperRecognizer : ISpeechRecognizer
                             {
                                 Encoder = Path.Combine(_modelPath, "encoder.onnx"),
                                 Decoder = Path.Combine(_modelPath, "decoder.onnx"),
+                                Language = "auto",  // 自动检测语言（支持 99 种）
+                                Task = "transcribe",
+                                Multilingual = true  // 启用多语言模式
+                            },
+                            BpeVocab = Path.Combine(_modelPath, "tokens.txt")
+                        },
+                        DecodingMethod = "greedy_search",
+                        MaxActivePaths = 4,
+                        EnableTruncation = false
+                    };
+
+                    _recognizer = new OnlineRecognizer(config);
+                    _isReady = true;
+                }
+
+                    var config = new OnlineRecognizerConfig
+                    {
+                        FeatsConfig = new FeatureExtractorConfig
+                        {
+                            SampleRate = 16000,
+                            FeatureDim = 80
+                        },
+                        ModelConfig = new OnlineModelConfig
+                        {
+                            Whisper = new WhisperConfig
+                            {
+                                Encoder = Path.Combine(_modelPath, "encoder.onnx"),
+                                Decoder = Path.Combine(_modelPath, "decoder.onnx"),
                                 Language = "zh",
                                 Task = "transcribe"
                             },
