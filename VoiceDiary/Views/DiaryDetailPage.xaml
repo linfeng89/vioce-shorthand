@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.DiaryDetailPage"
+             Title="日记详情">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            
+            <!-- 日期和时间 -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="15">
+                <Label Text="{Binding Entry.CreatedAt, StringFormat='{0:yyyy 年 MM 月 dd 日}'}" 
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+                <Label Text="{Binding Entry.CreatedAt, StringFormat='{0:HH:mm}'}" 
+                       FontSize="16"
+                       TextColor="Gray"/>
+            </HorizontalStackLayout>
+
+            <!-- 时长信息 -->
+            <Label Text="{Binding Entry.DurationSeconds, StringFormat='时长：{0:mm\\:ss}'}" 
+                   FontSize="14"
+                   TextColor="Gray"
+                   HorizontalOptions="Center"/>
+
+            <!-- 音频播放器 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <!-- 播放控制 -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
+                        <ImageButton Source="{Binding PlayPauseIcon}"
+                                     WidthRequest="50"
+                                     HeightRequest="50"
+                                     Aspect="AspectFit"
+                                     Command="{Binding PlayPauseCommand}"/>
+                    </HorizontalStackLayout>
+                    
+                    <!-- 进度条 -->
+                    <Slider Minimum="0"
+                            Maximum="{Binding Duration}"
+                            Value="{Binding CurrentPosition}"
+                            DragCompleted="OnSeek"/>
+                    
+                    <!-- 时间显示 -->
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                        <Label Text="{Binding CurrentPosition, StringFormat='{0:mm\\:ss}'}" 
+                               FontSize="12"
+                               TextColor="Gray"/>
+                        <Label Text="{Binding Duration, StringFormat='{0:mm\\:ss}'}" 
+                               FontSize="12"
+                               TextColor="Gray"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 转写文字区域 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                        <Label Text="转写文字" 
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <ImageButton Source="{Binding EditIcon}"
+                                     WidthRequest="30"
+                                     HeightRequest="30"
+                                     Aspect="AspectFill"
+                                     IsVisible="{Binding IsNotEditing}"
+                                     Command="{Binding ToggleEditCommand}"/>
+                    </HorizontalStackLayout>
+
+                    <!-- 编辑模式 -->
+                    <Editor x:Name="TextEdit"
+                            Text="{Binding TranscribedText}"
+                            IsVisible="{Binding IsEditing}"
+                            AutoSize="TextChanges"
+                            HeightRequest="300"
+                            Placeholder="点击编辑转写文字..."
+                            BackgroundColor="#F5F5F5"/>
+
+                    <!-- 查看模式 -->
+                    <Label Text="{Binding TranscribedText}"
+                           IsVisible="{Binding IsNotEditing}"
+                           FontSize="15"
+                           LineBreakMode="WordWrap"/>
+
+                    <!-- 编辑按钮 -->
+                    <HorizontalStackLayout HorizontalOptions="End" Spacing="10" IsVisible="{Binding IsEditing}">
+                        <Button Text="取消"
+                                BackgroundColor="#9E9E9E"
+                                Command="{Binding CancelEditCommand}"/>
+                        <Button Text="保存"
+                                BackgroundColor="#4CAF50"
+                                Command="{Binding SaveEditCommand}"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 删除按钮 -->
+            <Button Text="删除日记"
+                    BackgroundColor="#F44336"
+                    Command="{Binding DeleteCommand}"
+                    HorizontalOptions="Fill"
+                    Margin="0,20,0,0"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
