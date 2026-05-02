@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.DateRangePickerDialog"
+             Title="选择日期范围"
+             BackgroundColor="#80000000">
+
+    <Frame BorderColor="#E0E0E0"
+           HasShadow="True"
+           CornerRadius="10"
+           Padding="20"
+           HorizontalOptions="Center"
+           VerticalOptions="Center"
+           WidthRequest="320"
+           HeightRequest="400">
+        
+        <VerticalStackLayout Spacing="20">
+            
+            <!-- 标题 -->
+            <Label Text="选择日期范围"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+            
+            <!-- 开始日期 -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="开始日期" FontSize="14" TextColor="Gray"/>
+                <DatePicker x:Name="StartDatePicker"
+                            Date="{Binding StartDate}"
+                            Format="yyyy 年 MM 月 dd 日"
+                            FontSize="16"/>
+            </VerticalStackLayout>
+            
+            <!-- 结束日期 -->
+            <VerticalStackLayout Spacing="5">
+                <Label Text="结束日期" FontSize="14" TextColor="Gray"/>
+                <DatePicker x:Name="EndDatePicker"
+                            Date="{Binding EndDate}"
+                            Format="yyyy 年 MM 月 dd 日"
+                            FontSize="16"/>
+            </VerticalStackLayout>
+            
+            <!-- 日期验证错误提示 -->
+            <Label x:Name="ErrorLabel"
+                   Text=""
+                   TextColor="#F44336"
+                   FontSize="12"
+                   IsVisible="False"/>
+            
+            <!-- 按钮 -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="20" Margin="0,20,0,0">
+                <Button Text="清除"
+                        BackgroundColor="#9E9E9E"
+                        TextColor="White"
+                        WidthRequest="100"
+                        Clicked="OnClearClicked"/>
+                
+                <Button Text="应用"
+                        BackgroundColor="#007AFF"
+                        TextColor="White"
+                        WidthRequest="100"
+                        Clicked="OnApplyClicked"/>
+            </HorizontalStackLayout>
+            
+        </VerticalStackLayout>
+    </Frame>
+</ContentPage>

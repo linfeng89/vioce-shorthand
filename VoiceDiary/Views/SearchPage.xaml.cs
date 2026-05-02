@@ -41,6 +41,11 @@ public partial class SearchPage : ContentPage
 
         switch (result)
         {
+            case "取消":
+                return;
+            case "全部时间":
+                // 清除筛选
+                break;
             case "今天":
                 start = now.Date;
                 end = now;
@@ -54,10 +59,22 @@ public partial class SearchPage : ContentPage
                 end = now;
                 break;
             case "自定义":
-                // TODO: 显示日期选择器
-                break;
+                // 显示自定义日期选择器
+                await ShowCustomDateRangePicker();
+                return;
         }
 
         _viewModel.ApplyDateFilter(start, end);
+    }
+    
+    private async Task ShowCustomDateRangePicker()
+    {
+        var dialog = new DateRangePickerDialog();
+        dialog.DateRangeSelected += (s, e) =>
+        {
+            _viewModel.ApplyDateFilter(e.StartDate, e.EndDate);
+        };
+        
+        await Navigation.PushModalAsync(dialog);
     }
 }

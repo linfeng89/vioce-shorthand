@@ -14,4 +14,13 @@ public partial class DiaryDetailPage : ContentPage
         var viewModel = (DiaryDetailViewModel)BindingContext;
         await viewModel.PlayPauseCommand.ExecuteAsync(null);
     }
+    
+    private async void OnSeek(object sender, DragCompletedEventArgs e)
+    {
+        if (sender is Slider slider)
+        {
+            var viewModel = (DiaryDetailViewModel)BindingContext;
+            await viewModel.SeekCommand.ExecuteAsync(slider.Value);
+        }
+    }
 }

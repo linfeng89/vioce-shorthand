@@ -40,6 +40,7 @@ public class DatabaseService : IDatabaseService
         await _connection!.CreateTableAsync<DiaryEntry>();
         await _connection.CreateTableAsync<AudioSegment>();
         await _connection.CreateTableAsync<AppSettings>();
+        await _connection.CreateTableAsync<SearchHistory>();
     }
 
     private async Task CreateIndexesAsync()
