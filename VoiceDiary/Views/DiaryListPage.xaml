@@ -5,10 +5,23 @@
              Title="日记列表">
 
     <Grid>
+        <!-- 月份指示器 -->
+        <Label Grid.Row="0"
+               Text="{Binding CurrentMonth}"
+               FontSize="24"
+               FontAttributes="Bold"
+               TextColor="#007AFF"
+               HorizontalOptions="Center"
+               VerticalOptions="Start"
+               Margin="0,20,0,0"
+               IsVisible="{Binding CurrentMonth, Converter={StaticResource StringToBoolConverter}}"/>
+
+        <!-- 日记列表 -->
         <CollectionView ItemsSource="{Binding Entries}"
                         SelectionMode="None"
                         RemainingItemsThreshold="5"
-                        RemainingItemsThresholdReached="OnThresholdReached">
+                        RemainingItemsThresholdReached="OnThresholdReached"
+                        Margin="10,60,10,80">
             
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -17,56 +30,91 @@
                             <SwipeItems>
                                 <SwipeItem Text="删除" 
                                            BackgroundColor="Red"
+                                           ForegroundColor="White"
                                            CommandParameter="{Binding .}"
-                                           Invoked="OnDeleteInvoked"/>
+                                           Invoked="OnSwipeToDelete"/>
                             </SwipeItems>
                         </SwipeView.RightItems>
                         
                         <ContentView Padding="15,10">
-                            <VerticalStackLayout Spacing="5">
-                                <Label Text="{Binding TranscribedText}" 
-                                       MaxLines="3"
-                                       LineBreakMode="TailTruncation"
-                                       FontSize="16"/>
-                                <HorizontalStackLayout Spacing="10">
-                                    <Label Text="{Binding CreatedAt, StringFormat='{0:MM-dd HH:mm}'}" 
-                                           FontSize="12" 
-                                           TextColor="Gray"/>
-                                    <Label Text="{Binding DurationSeconds, StringFormat='{0:mm\\:ss}'}" 
-                                           FontSize="12" 
-                                           TextColor="Gray"/>
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
+                            <Frame Padding="15" Margin="0,5" HasShadow="False" BorderColor="#E0E0E0">
+                                <VerticalStackLayout Spacing="8">
+                                    <!-- 时间段和时长 -->
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="🌅" FontSize="16"/>
+                                        <Label Text="{Binding CreatedAt, StringFormat='{0:MM-dd HH:mm}'}" 
+                                               FontSize="13" 
+                                               TextColor="#666666"/>
+                                        <Label Text="•" FontSize="13" TextColor="#666666"/>
+                                        <Label Text="{Binding DurationSeconds, StringFormat='{0:mm\\:ss}'}" 
+                                               FontSize="13" 
+                                               TextColor="#666666"/>
+                                    </HorizontalStackLayout>
+                                    
+                                    <!-- 转写文字 -->
+                                    <Label Text="{Binding TranscribedText}" 
+                                           FontSize="15"
+                                           LineBreakMode="WordWrap"
+                                           MaxLines="3"
+                                           TextColor="#333333"/>
+                                </VerticalStackLayout>
+                            </Frame>
                         </ContentView>
                     </SwipeView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             
             <CollectionView.EmptyView>
-                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
-                    <Label Text="📝" FontSize="48" HorizontalOptions="Center"/>
-                    <Label Text="暂无日记记录" FontSize="16" TextColor="Gray" HorizontalOptions="Center"/>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                    <Label Text="📝" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="暂无日记记录" FontSize="16" TextColor="#999999" HorizontalOptions="Center"/>
+                    <Label Text="按住红色按钮开始录音" FontSize="14" TextColor="#CCCCCC" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
             
             <CollectionView.Footer>
-                <StackLayout IsVisible="{Binding IsBusy}">
-                    <ActivityIndicator IsRunning="True" HorizontalOptions="Center"/>
+                <StackLayout IsVisible="{Binding IsBusy}" HeightRequest="60">
+                    <ActivityIndicator IsRunning="True" 
+                                       Color="#007AFF"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
                 </StackLayout>
             </CollectionView.Footer>
         </CollectionView>
 
-        <AbsoluteLayout>
-            <Frame Bottom="20" 
-                   Right="20"
-                   WidthRequest="60" 
+        <!-- 底部操作按钮 -->
+        <HorizontalStackLayout HorizontalOptions="Center" 
+                               VerticalOptions="End" 
+                               Spacing="20"
+                               Margin="0,0,0,20">
+            
+            <!-- 搜索按钮 -->
+            <Frame WidthRequest="60" 
                    HeightRequest="60"
                    CornerRadius="30"
                    Padding="0"
                    IsClippedToBounds="True"
-                   BackgroundColor="#007AFF">
-                <Label Text="🗑" 
-                       FontSize="30"
+                   BackgroundColor="#007AFF"
+                   HasShadow="True">
+                <Label Text="🔍" 
+                       FontSize="28"
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center"/>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSearchTapped"/>
+                </Frame.GestureRecognizers>
+            </Frame>
+
+            <!-- 回收站按钮 -->
+            <Frame WidthRequest="60" 
+                   HeightRequest="60"
+                   CornerRadius="30"
+                   Padding="0"
+                   IsClippedToBounds="True"
+                   BackgroundColor="#FF9500"
+                   HasShadow="True">
+                <Label Text="🗑️" 
+                       FontSize="28"
                        HorizontalOptions="Center" 
                        VerticalOptions="Center"/>
                 <Frame.GestureRecognizers>
@@ -74,22 +122,22 @@
                 </Frame.GestureRecognizers>
             </Frame>
 
-            <Frame Bottom="90" 
-                   Right="20"
-                   WidthRequest="60" 
+            <!-- 设置按钮 -->
+            <Frame WidthRequest="60" 
                    HeightRequest="60"
                    CornerRadius="30"
                    Padding="0"
                    IsClippedToBounds="True"
-                   BackgroundColor="#8E8E93">
+                   BackgroundColor="#8E8E93"
+                   HasShadow="True">
                 <Label Text="⚙️" 
-                       FontSize="30"
+                       FontSize="28"
                        HorizontalOptions="Center" 
                        VerticalOptions="Center"/>
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnSettingsTapped"/>
                 </Frame.GestureRecognizers>
             </Frame>
-        </AbsoluteLayout>
+        </HorizontalStackLayout>
     </Grid>
 </ContentPage>

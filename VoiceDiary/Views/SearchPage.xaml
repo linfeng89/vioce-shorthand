@@ -65,9 +65,14 @@
                                            TextColor="Gray"/>
                                 </HorizontalStackLayout>
                                 
-                                <Label Text="{Binding TranscribedText}" 
-                                       FontSize="15"
-                                       LineBreakMode="WordWrap"/>
+                                <Label FontSize="15"
+                                       LineBreakMode="WordWrap">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding TranscribedText}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
                             </VerticalStackLayout>
                         </Frame>
                     </ContentView>
