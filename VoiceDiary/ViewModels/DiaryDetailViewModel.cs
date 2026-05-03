@@ -137,7 +137,11 @@ public partial class DiaryDetailViewModel : BaseViewModel
 
     private void OnPlaybackProgressChanged(object? sender, AudioPlaybackEventArgs e)
     {
-        CurrentPosition = e.CurrentPosition;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            CurrentPosition = e.CurrentPosition;
+            OnPropertyChanged(nameof(CurrentPosition));
+        });
     }
 
     private void OnPlaybackCompleted(object? sender, AudioPlaybackEventArgs e)

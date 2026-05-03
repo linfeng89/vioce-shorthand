@@ -9,6 +9,9 @@ public partial class SearchPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        
+        // 页面加载时加载搜索历史
+        Loaded += async (s, e) => await _viewModel.LoadHistoryCommand.ExecuteAsync(null);
     }
 
     private async void OnSearchTextChanged(object sender, TextChangedEventArgs e)

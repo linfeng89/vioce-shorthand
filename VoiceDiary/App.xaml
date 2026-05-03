@@ -12,6 +12,8 @@
             
             <!-- 转换器 -->
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
+            <converters:CountToBoolConverter x:Key="CountToBoolConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

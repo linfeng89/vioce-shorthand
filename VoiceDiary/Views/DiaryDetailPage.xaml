@@ -28,11 +28,16 @@
                 <VerticalStackLayout Spacing="10">
                     <!-- 播放控制 -->
                     <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
-                        <ImageButton Source="{Binding PlayPauseIcon}"
-                                     WidthRequest="50"
-                                     HeightRequest="50"
-                                     Aspect="AspectFit"
-                                     Command="{Binding PlayPauseCommand}"/>
+                        <Button Text="{Binding PlayPauseIcon}"
+                                FontSize="24"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                CornerRadius="30"
+                                Padding="0"
+                                BackgroundColor="#007AFF"
+                                TextColor="White"
+                                BorderWidth="0"
+                                Command="{Binding PlayPauseCommand}"/>
                     </HorizontalStackLayout>
                     
                     <!-- 进度条 -->
@@ -43,12 +48,18 @@
                     
                     <!-- 时间显示 -->
                     <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
-                        <Label Text="{Binding CurrentPosition, StringFormat='{0:mm\\:ss}'}" 
+                        <Label Text="{Binding CurrentPosition, Converter={StaticResource TimeSpanToStringConverter}}" 
                                FontSize="12"
-                               TextColor="Gray"/>
-                        <Label Text="{Binding Duration, StringFormat='{0:mm\\:ss}'}" 
+                               TextColor="Gray"
+                               VerticalOptions="Center"/>
+                        <Label Text="/" 
                                FontSize="12"
-                               TextColor="Gray"/>
+                               TextColor="Gray"
+                               VerticalOptions="Center"/>
+                        <Label Text="{Binding Duration, Converter={StaticResource TimeSpanToStringConverter}}" 
+                               FontSize="12"
+                               TextColor="Gray"
+                               VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>

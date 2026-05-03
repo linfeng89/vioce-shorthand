@@ -45,11 +45,63 @@
                     FontSize="14"/>
         </VerticalStackLayout>
 
-        <!-- 搜索结果 -->
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding SearchResults}"
-                        SelectionMode="None"
-                        Margin="10">
+        <!-- 搜索结果和历史 -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <!-- 搜索历史区域 -->
+            <VerticalStackLayout Grid.Row="0" 
+                                 IsVisible="{Binding ShowHistory}"
+                                 Padding="15,10"
+                                 Spacing="10">
+                <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                    <Label Text="最近搜索" 
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#666666"/>
+                    <Button Text="清空历史"
+                            BackgroundColor="Transparent"
+                            TextColor="#FF3B30"
+                            FontSize="12"
+                            Padding="10,5"
+                            Command="{Binding ClearHistoryCommand}"/>
+                </HorizontalStackLayout>
+                
+                <CollectionView ItemsSource="{Binding SearchHistory}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedHistoryItem, Mode=TwoWay}"
+                                SelectionChangedCommand="{Binding SelectHistoryCommand}"
+                                HeightRequest="200">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <ContentView Padding="10,5">
+                                <Frame Padding="15" 
+                                       Margin="0,3" 
+                                       HasShadow="False" 
+                                       BorderColor="#E0E0E0"
+                                       BackgroundColor="#F8F8F8">
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="🔍" FontSize="16"/>
+                                        <VerticalStackLayout>
+                                            <Label Text="{Binding Query}" 
+                                                   FontSize="15"
+                                                   TextColor="#333333"/>
+                                            <Label Text="{Binding DisplayText}" 
+                                                   FontSize="12"
+                                                   TextColor="#999999"/>
+                                        </VerticalStackLayout>
+                                    </HorizontalStackLayout>
+                                </Frame>
+                            </ContentView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+            
+            <!-- 搜索结果区域 -->
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding SearchResults}"
+                            SelectionMode="None"
+                            Margin="10"
+                            IsVisible="{Binding ShowHistory, Converter={StaticResource InverseBoolConverter}}">
             
             <CollectionView.ItemTemplate>
                 <DataTemplate>
