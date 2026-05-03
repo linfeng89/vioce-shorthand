@@ -26,6 +26,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</TargetPlatformMinVersion>
+		
+		<!-- Android Permissions -->
+		<AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
+		<AndroidManifest>Platforms/Android/AndroidManifest.xml</AndroidManifest>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -43,6 +47,10 @@
 
 		<!-- Raw Assets -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		
+		<!-- Android Resources -->
+		<AndroidResource Include="Platforms\Android\Resources\**\*.xml" />
+		<AndroidResource Include="Platforms\Android\Resources\**\*.png" />
 	</ItemGroup>
 
 	<ItemGroup>

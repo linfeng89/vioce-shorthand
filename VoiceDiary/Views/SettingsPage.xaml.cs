@@ -12,4 +12,9 @@ public partial class SettingsPage : ContentPage
     {
         await Navigation.PushAsync(new SecuritySettingsPage(App.Services.GetRequiredService<SecuritySettingsViewModel>()));
     }
+    
+    private async void OnQuickRecordSettingsTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new QuickRecordSettingsPage());
+    }
 }

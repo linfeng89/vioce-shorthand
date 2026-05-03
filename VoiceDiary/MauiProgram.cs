@@ -51,6 +51,8 @@ public static class MauiProgram
         services.AddSingleton<IToastService, ToastService>();
         services.AddSingleton<ITrashService, TrashService>();
         services.AddSingleton<IAppLockManager, AppLockManager>();
+        services.AddSingleton<INotificationService, AndroidNotificationService>();
+        services.AddSingleton<IQuickRecordService, QuickRecordService>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)
@@ -74,5 +76,6 @@ public static class MauiProgram
         services.AddTransient<TrashPage>();
         services.AddTransient<SearchPage>();
         services.AddTransient<SecuritySettingsPage>();
+        services.AddTransient<QuickRecordSettingsPage>();
     }
 }

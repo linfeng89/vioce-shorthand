@@ -48,20 +48,23 @@
 
             <Label Text="🎙️ 快捷录音" FontSize="18" FontAttributes="Bold"/>
             
-            <HorizontalStackLayout>
-                <Label Text="桌面 Widget" VerticalOptions="Center" WidthRequest="150"/>
-                <Switch IsToggled="{Binding DesktopWidgetEnabled}" HorizontalOptions="EndAndExpand"/>
-            </HorizontalStackLayout>
-
-            <HorizontalStackLayout>
-                <Label Text="耳机双击触发" VerticalOptions="Center" WidthRequest="150"/>
-                <Switch IsToggled="{Binding HeadphoneTriggerEnabled}" HorizontalOptions="EndAndExpand"/>
-                <Label Text="（取决于平台支持）" 
-                       FontSize="12" 
-                       TextColor="Gray"
-                       VerticalOptions="Center"
-                       Margin="5,0,0,0"/>
-            </HorizontalStackLayout>
+            <Frame BackgroundColor="#F8F8F8" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                        <Label Text="快捷录音设置" VerticalOptions="Center"/>
+                        <Label Text="查看详情 →" 
+                               TextColor="#007AFF"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnQuickRecordSettingsTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <Label Text="桌面小组件、通知栏、耳机触发"
+                           FontSize="12"
+                           TextColor="#999999"/>
+                </VerticalStackLayout>
+            </Frame>
 
             <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
 
