@@ -22,4 +22,8 @@ public class SecuritySettings
     
     // 预留密码字段（未来实现）
     public string? PinCode { get; set; }
+    
+    public int FailedAttempts { get; set; }
+    
+    public bool UsePasswordFallback { get; set; }
 }

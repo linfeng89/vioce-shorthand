@@ -8,6 +8,9 @@ public partial class LockScreenViewModel : BaseViewModel
     private bool _isLockScreenVisible;
     private bool _isAuthenticating;
     private bool _canCancel = true;
+    private bool _showPasswordOption;
+    private string _passwordInput = string.Empty;
+    private int _failedAttempts;
     
     public event EventHandler<bool>? LockStateChanged;
     
@@ -39,8 +42,22 @@ public partial class LockScreenViewModel : BaseViewModel
         set => SetProperty(ref _canCancel, value);
     }
     
+    public bool ShowPasswordOption
+    {
+        get => _showPasswordOption;
+        set => SetProperty(ref _showPasswordOption, value);
+    }
+    
+    public string PasswordInput
+    {
+        get => _passwordInput;
+        set => SetProperty(ref _passwordInput, value);
+    }
+    
     public Command AuthenticateCommand => new Command(async () => await AuthenticateAsync());
     public Command CancelCommand => new Command(() => Cancel());
+    public Command UsePasswordCommand => new Command(() => UsePassword());
+    public Command SubmitPasswordCommand => new Command(async () => await SubmitPasswordAsync());
     
     public async Task ShowAsync()
     {
@@ -76,6 +93,14 @@ public partial class LockScreenViewModel : BaseViewModel
                 IsAuthenticating = false;
                 OnPropertyChanged(nameof(IsNotAuthenticating));
                 
+                _failedAttempts++;
+                
+                // 3 次失败后显示密码选项
+                if (_failedAttempts >= 3)
+                {
+                    ShowPasswordOption = true;
+                }
+                
                 await Shell.Current.DisplayAlert("验证失败", 
                     result switch
                     {
@@ -96,6 +121,38 @@ public partial class LockScreenViewModel : BaseViewModel
             Console.WriteLine($"Authenticate error: {ex}");
             IsAuthenticating = false;
             OnPropertyChanged(nameof(IsNotAuthenticating));
+        }
+    }
+    
+    private void UsePassword()
+    {
+        ShowPasswordOption = true;
+    }
+    
+    private async Task SubmitPasswordAsync()
+    {
+        if (string.IsNullOrWhiteSpace(PasswordInput))
+        {
+            await Shell.Current.DisplayAlert("错误", "请输入密码", "确定");
+            return;
+        }
+        
+        // TODO: 验证密码（未来实现）
+        // 临时实现：密码为 123456
+        
+        if (PasswordInput == "123456")
+        {
+            await _appLockManager.RecordSuccessfulAuthAsync();
+            IsLockScreenVisible = false;
+            PasswordInput = string.Empty;
+            ShowPasswordOption = false;
+            _failedAttempts = 0;
+            LockStateChanged?.Invoke(this, true);
+        }
+        else
+        {
+            await Shell.Current.DisplayAlert("错误", "密码错误", "确定");
+            PasswordInput = string.Empty;
         }
     }
     

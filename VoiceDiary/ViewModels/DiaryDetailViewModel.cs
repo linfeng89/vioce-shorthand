@@ -7,6 +7,8 @@ public partial class DiaryDetailViewModel : BaseViewModel
     private readonly IAudioPlayer _audioPlayer;
     private readonly ITrashService _trashService;
     private readonly IToastService _toastService;
+    private readonly IAppLockManager _appLockManager;
+    private readonly IBiometricAuthService _biometricService;
 
     private DiaryEntry? _entry;
     private bool _isPlaying;
@@ -20,19 +22,26 @@ public partial class DiaryDetailViewModel : BaseViewModel
         IDatabaseService databaseService,
         IAudioPlayer audioPlayer,
         ITrashService trashService,
-        IToastService toastService)
+        IToastService toastService,
+        IAppLockManager appLockManager,
+        IBiometricAuthService biometricService)
     {
         _storageService = storageService;
         _databaseService = databaseService;
         _audioPlayer = audioPlayer;
         _trashService = trashService;
         _toastService = toastService;
+        _appLockManager = appLockManager;
+        _biometricService = biometricService;
 
         _audioPlayer.PlaybackProgressChanged += OnPlaybackProgressChanged;
         _audioPlayer.PlaybackCompleted += OnPlaybackCompleted;
         _audioPlayer.PlaybackStopped += OnPlaybackStopped;
         
         _originalText = string.Empty;
+        
+        // 页面加载时检查是否需要验证
+        Task.Run(async () => await VerifyAccessAsync());
     }
 
     ~DiaryDetailViewModel()
@@ -99,6 +108,7 @@ public partial class DiaryDetailViewModel : BaseViewModel
     public Command SaveEditCommand => new Command(async () => await SaveEditAsync());
     public Command DeleteCommand => new Command(async () => await DeleteAsync());
     public Command SeekCommand => new Command<double>(async (position) => await SeekAsync(position));
+    public Command VerifyAccessCommand => new Command(async () => await VerifyAccessAsync());
 
     private async Task PlayPauseAsync()
     {
@@ -294,6 +304,32 @@ public partial class DiaryDetailViewModel : BaseViewModel
         catch (Exception ex)
         {
             Console.WriteLine($"Seek error: {ex}");
+        }
+    }
+    
+    private async Task VerifyAccessAsync()
+    {
+        try
+        {
+            if (_appLockManager.ShouldRequireAuth(AppAccessScenario.ViewDiaryDetail))
+            {
+                var result = await _biometricService.AuthenticateAsync("验证身份以查看日记详情");
+                
+                if (result != BiometricAuthResult.Success)
+                {
+                    // 验证失败，返回上一页
+                    await Shell.Current.Navigation.PopAsync();
+                    await _toastService.Show("验证失败", 2000);
+                }
+                else
+                {
+                    await _appLockManager.RecordSuccessfulAuthAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Verify access error: {ex}");
         }
     }
 }

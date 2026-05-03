@@ -47,7 +47,34 @@
                     CornerRadius="27"
                     HorizontalOptions="Center"
                     Command="{Binding AuthenticateCommand}"
-                    IsEnabled="{Binding IsNotAuthenticating}"/>
+                    IsEnabled="{Binding IsNotAuthenticating}"
+                    IsVisible="{Binding ShowPasswordOption, Converter={StaticResource InverseBoolConverter}}"/>
+            
+            <!-- 密码输入（备用） -->
+            <VerticalStackLayout Spacing="15"
+                                 IsVisible="{Binding ShowPasswordOption}"
+                                 WidthRequest="250">
+                <Entry Placeholder="输入密码"
+                       Text="{Binding PasswordInput}"
+                       IsPassword="True"
+                       TextColor="White"
+                       PlaceholderColor="#CCCCCC"
+                       HorizontalOptions="Fill"/>
+                
+                <Button Text="提交密码"
+                        BackgroundColor="#34C759"
+                        TextColor="White"
+                        FontSize="16"
+                        HeightRequest="50"
+                        CornerRadius="25"
+                        Command="{Binding SubmitPasswordCommand}"/>
+                
+                <Button Text="使用生物识别"
+                        BackgroundColor="Transparent"
+                        TextColor="#CCCCCC"
+                        FontSize="14"
+                        Command="{Binding AuthenticateCommand}"/>
+            </VerticalStackLayout>
             
             <!-- 取消按钮（可选） -->
             <Button Text="稍后再说"
@@ -56,7 +83,8 @@
                     FontSize="14"
                     HorizontalOptions="Center"
                     Command="{Binding CancelCommand}"
-                    IsVisible="{Binding CanCancel}"/>
+                    IsVisible="{Binding CanCancel}"
+                    IsEnabled="{Binding IsNotAuthenticating}"/>
             
             <!-- 加载指示器 -->
             <ActivityIndicator IsRunning="{Binding IsAuthenticating}"
