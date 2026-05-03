@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.SecuritySettingsPage"
+             Title="安全设置">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- 说明 -->
+            <Frame BackgroundColor="#F8F8F8" Padding="15" HasShadow="False">
+                <Label Text="启用应用锁后，每次访问应用时需要验证身份（指纹/面部识别）以保护隐私数据。"
+                       FontSize="13"
+                       TextColor="#666666"
+                       LineBreakMode="WordWrap"/>
+            </Frame>
+            
+            <!-- 应用锁开关 -->
+            <VerticalStackLayout Spacing="10">
+                <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                    <Label Text="启用应用锁"
+                           FontSize="16"
+                           VerticalOptions="Center"/>
+                    <Switch IsOn="{Binding IsAppLockEnabled}"
+                            OnColor="#007AFF"
+                            HorizontalOptions="End"/>
+                </HorizontalStackLayout>
+                <Label Text="开启后需要生物识别验证"
+                       FontSize="12"
+                       TextColor="#999999"/>
+            </VerticalStackLayout>
+            
+            <BoxView HeightRequest="1" 
+                     BackgroundColor="#E0E0E0"
+                     HorizontalOptions="Fill"/>
+            
+            <!-- 超时设置 -->
+            <VerticalStackLayout Spacing="10"
+                                 IsEnabled="{Binding IsAppLockEnabled}">
+                <Label Text="自动锁定时间"
+                       FontSize="16"/>
+                
+                <Picker Title="选择锁定时间"
+                        SelectedItem="{Binding SelectedTimeout}"
+                        TextColor="{Binding PickerTextColor}">
+                    <Picker.Items>
+                        <x:String>立即</x:String>
+                        <x:String>30 秒后</x:String>
+                        <x:String>1 分钟后</x:String>
+                        <x:String>5 分钟后</x:String>
+                        <x:String>从不</x:String>
+                    </Picker.Items>
+                </Picker>
+                
+                <Label Text="{Binding TimeoutDescription}"
+                       FontSize="12"
+                       TextColor="#999999"/>
+            </VerticalStackLayout>
+            
+            <BoxView HeightRequest="1" 
+                     BackgroundColor="#E0E0E0"
+                     HorizontalOptions="Fill"/>
+            
+            <!-- 生物识别状态 -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="生物识别状态"
+                       FontSize="16"/>
+                
+                <HorizontalStackLayout Spacing="10">
+                    <Label Text="{Binding BiometricStatusIcon}"
+                           FontSize="20"/>
+                    <Label Text="{Binding BiometricStatusText}"
+                           FontSize="14"
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            
+            <!-- 测试按钮 -->
+            <Button Text="测试生物识别"
+                    BackgroundColor="#007AFF"
+                    TextColor="White"
+                    Command="{Binding TestBiometricCommand}"
+                    IsEnabled="{Binding IsAppLockEnabled}"
+                    Margin="0,20,0,0"/>
+            
+            <!-- 注意事项 -->
+            <Frame BackgroundColor="#FFF3CD" 
+                   Padding="15" 
+                   HasShadow="False"
+                   BorderColor="#FFC107"
+                   Margin="0,20,0,0">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="⚠️ 注意事项"
+                           FontSize="14"
+                           FontAttributes="Bold"/>
+                    <Label Text="• 请确保设备已设置锁屏密码"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                    <Label Text="• 建议在设置生物识别后再启用此功能"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                    <Label Text="• 忘记密码将无法恢复数据"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -9,25 +9,23 @@
             
             <Label Text="🔒 隐私" FontSize="18" FontAttributes="Bold"/>
             
-            <HorizontalStackLayout>
-                <Label Text="应用锁" VerticalOptions="Center" WidthRequest="150"/>
-                <Switch IsToggled="{Binding BiometricLockEnabled}" HorizontalOptions="EndAndExpand"/>
-            </HorizontalStackLayout>
-
-            <HorizontalStackLayout>
-                <Label Text="自动锁定" VerticalOptions="Center" WidthRequest="150"/>
-                <Picker SelectedItem="{Binding AutoLockTime}" 
-                        HorizontalOptions="EndAndExpand"
-                        WidthRequest="150">
-                    <Picker.Items>
-                        <x:String>立即锁定</x:String>
-                        <x:String>30 秒</x:String>
-                        <x:String>1 分钟</x:String>
-                        <x:String>5 分钟</x:String>
-                        <x:String>从不</x:String>
-                    </Picker.Items>
-                </Picker>
-            </HorizontalStackLayout>
+            <Frame BackgroundColor="#F8F8F8" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                        <Label Text="应用锁" VerticalOptions="Center"/>
+                        <Label Text="管理安全设置 →" 
+                               TextColor="#007AFF"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSecuritySettingsTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <Label Text="启用生物识别保护隐私数据"
+                           FontSize="12"
+                           TextColor="#999999"/>
+                </VerticalStackLayout>
+            </Frame>
 
             <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
 

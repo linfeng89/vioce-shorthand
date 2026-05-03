@@ -7,4 +7,9 @@ public partial class SettingsPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+    
+    private async void OnSecuritySettingsTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new SecuritySettingsPage(App.Services.GetRequiredService<SecuritySettingsViewModel>()));
+    }
 }

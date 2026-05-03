@@ -50,6 +50,7 @@ public static class MauiProgram
         services.AddSingleton<ISearchService, SearchService>();
         services.AddSingleton<IToastService, ToastService>();
         services.AddSingleton<ITrashService, TrashService>();
+        services.AddSingleton<IAppLockManager, AppLockManager>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)
@@ -60,6 +61,8 @@ public static class MauiProgram
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<TrashViewModel>();
         services.AddTransient<SearchViewModel>();
+        services.AddTransient<SecuritySettingsViewModel>();
+        services.AddTransient<LockScreenViewModel>();
     }
 
     private static void RegisterPages(IServiceCollection services)
@@ -70,5 +73,6 @@ public static class MauiProgram
         services.AddTransient<SettingsPage>();
         services.AddTransient<TrashPage>();
         services.AddTransient<SearchPage>();
+        services.AddTransient<SecuritySettingsPage>();
     }
 }

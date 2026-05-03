@@ -4,6 +4,8 @@ public partial class App : Application
 {
     private readonly IServiceProvider _serviceProvider;
     private CancellationTokenSource? _appCts;
+    private LockScreenViewModel? _lockScreenViewModel;
+    private LockScreenOverlay? _lockScreenOverlay;
 
     public App(IServiceProvider serviceProvider)
     {
@@ -23,6 +25,9 @@ public partial class App : Application
         _appCts = new CancellationTokenSource();
         
         InitializeServicesAsync();
+        
+        // 初始化锁屏
+        InitializeLockScreen();
         
         MainPage = new NavigationPage(new RecordPage(serviceProvider.GetRequiredService<RecordViewModel>()));
     }
@@ -59,7 +64,7 @@ public partial class App : Application
         _appCts?.Cancel();
     }
 
-    protected override void OnResume()
+    protected override async void OnResume()
     {
         base.OnResume();
         
@@ -69,6 +74,9 @@ public partial class App : Application
             var transcriptionQueue = _serviceProvider.GetRequiredService<ITranscriptionQueueService>();
             _ = transcriptionQueue.StartAsync(_appCts.Token);
         }
+        
+        // 从后台恢复时检查是否需要验证
+        await CheckAndShowLockScreenAsync(AppAccessScenario.ReturnFromBackground);
     }
 
     protected override void OnStop()
@@ -88,5 +96,37 @@ public partial class App : Application
     public static void NavigateToSettings()
     {
         Current.MainPage?.Navigation.PushAsync(new SettingsPage(Current.Services.GetRequiredService<SettingsViewModel>()));
+    }
+    
+    private void InitializeLockScreen()
+    {
+        _lockScreenViewModel = _serviceProvider.GetRequiredService<LockScreenViewModel>();
+        _lockScreenOverlay = new LockScreenOverlay(_lockScreenViewModel);
+        
+        // 将锁屏添加到主页面
+        if (MainPage is NavigationPage navPage && navPage.CurrentPage != null)
+        {
+            var grid = new Grid();
+            grid.Children.Add(navPage.CurrentPage.Content);
+            grid.Children.Add(_lockScreenOverlay);
+            navPage.CurrentPage.Content = grid;
+        }
+    }
+    
+    private async Task CheckAndShowLockScreenAsync(AppAccessScenario scenario)
+    {
+        try
+        {
+            var appLockManager = _serviceProvider.GetRequiredService<IAppLockManager>();
+            
+            if (appLockManager.ShouldRequireAuth(scenario))
+            {
+                await _lockScreenViewModel!.ShowAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Lock screen check error: {ex}");
+        }
     }
 }
