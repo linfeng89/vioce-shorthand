@@ -2,16 +2,11 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "260502-chore-setup-voice-diary-framework" ]
+    branches: [ "main", "260502-chore-setup-voice-diary-framework" ]
     tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version tag (e.g., v0.3.0-sprint3)'
-        required: true
-        default: 'v0.3.0-sprint3'
 
 env:
   DOTNET_VERSION: '8.0.x'
