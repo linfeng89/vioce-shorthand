@@ -31,18 +31,23 @@
 
             <Label Text="💾 存储" FontSize="18" FontAttributes="Bold"/>
             
-            <Label Text="{Binding StorageInfo}" FontSize="14"/>
-
-            <HorizontalStackLayout Spacing="10">
-                <Button Text="立即备份" 
-                        Command="{Binding BackupCommand}"
-                        BackgroundColor="#007AFF"
-                        WidthRequest="130"/>
-                <Button Text="恢复备份" 
-                        Command="{Binding RestoreBackupCommand}"
-                        BackgroundColor="#5856D6"
-                        WidthRequest="130"/>
-            </HorizontalStackLayout>
+            <Frame BackgroundColor="#F8F8F8" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout HorizontalOptions="SpaceBetween">
+                        <Label Text="备份管理" VerticalOptions="Center"/>
+                        <Label Text="查看备份设置 →" 
+                               TextColor="#007AFF"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBackupSettingsTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+                    <Label Text="创建/恢复备份，自动备份设置"
+                           FontSize="12"
+                           TextColor="#999999"/>
+                </VerticalStackLayout>
+            </Frame>
 
             <BoxView HeightRequest="1" BackgroundColor="#CCCCCC" Margin="0,10"/>
 

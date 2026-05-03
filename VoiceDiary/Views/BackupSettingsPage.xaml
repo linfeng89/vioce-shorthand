@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VoiceDiary.Views.BackupSettingsPage"
+             Title="备份设置">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- 说明 -->
+            <Frame BackgroundColor="#E3F2FD" Padding="15" HasShadow="False" BorderColor="#2196F3">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="💡 备份说明"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#0D47A1"/>
+                    <Label Text="定期备份可以保护您的日记数据不丢失。建议开启自动备份功能。"
+                           FontSize="12"
+                           TextColor="#01579B"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 立即备份 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="立即备份"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Label Text="创建完整备份（包含所有日记和音频）"
+                           FontSize="12"
+                           TextColor="#666666"/>
+                    <Button Text="📦 创建备份"
+                            BackgroundColor="#007AFF"
+                            Command="{Binding CreateBackupCommand}"
+                            HorizontalOptions="Fill"
+                            Margin="0,10,0,0"/>
+                    <ActivityIndicator IsRunning="{Binding IsCreatingBackup}"
+                                       IsVisible="{Binding IsCreatingBackup}"
+                                       Color="#007AFF"
+                                       HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 恢复备份 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="恢复备份"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    
+                    <!-- 最近备份信息 -->
+                    <Frame BackgroundColor="#F5F5F5" Padding="10" HasShadow="False" IsVisible="{Binding HasBackup}">
+                        <VerticalStackLayout Spacing="5">
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="📅" FontSize="16"/>
+                                <Label Text="{Binding LastBackupDate, StringFormat='最近备份：{0:yyyy-MM-dd HH:mm}'}"
+                                       FontSize="13"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding BackupFileSize, StringFormat='文件大小：{0}'}"
+                                   FontSize="12"
+                                   TextColor="#666666"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <Frame BackgroundColor="#FFF3CD" Padding="10" HasShadow="False" BorderColor="#FFC107" IsVisible="{Binding HasBackup, Converter={StaticResource InverseBoolConverter}}">
+                        <Label Text="⚠️ 暂无可用备份"
+                               FontSize="12"
+                               TextColor="#856404"/>
+                    </Frame>
+                    
+                    <Button Text="♻️ 恢复备份"
+                            BackgroundColor="#28A745"
+                            Command="{Binding RestoreBackupCommand}"
+                            IsEnabled="{Binding HasBackup}"
+                            HorizontalOptions="Fill"
+                            Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 自动备份 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <HorizontalStackLayout HorizontalOptions="SpaceBetween>
+                        <Label Text="自动备份"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Switch IsOn="{Binding AutoBackupEnabled}"
+                                OnColor="#007AFF"
+                                HorizontalOptions="End"/>
+                    </HorizontalStackLayout>
+                    
+                    <Label Text="开启后每周自动备份一次"
+                           FontSize="12"
+                           TextColor="#666666"/>
+                    
+                    <!-- 备份间隔 -->
+                    <VerticalStackLayout Spacing="5"
+                                         IsEnabled="{Binding AutoBackupEnabled}"
+                                         Margin="0,10,0,0">
+                        <Label Text="备份频率"
+                               FontSize="13"/>
+                        <Picker SelectedItem="{Binding SelectedBackupInterval}"
+                                Title="选择备份频率">
+                            <Picker.Items>
+                                <x:String>每天</x:String>
+                                <x:String>每周</x:String>
+                                <x:String>每月</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
+                    
+                    <!-- 云备份 -->
+                    <VerticalStackLayout Spacing="5" Margin="0,10,0,0">
+                        <HorizontalStackLayout HorizontalOptions="SpaceBetween>
+                            <Label Text="云备份"
+                                   FontSize="13"/>
+                            <Switch IsOn="{Binding CloudBackupEnabled}"
+                                    IsEnabled="False"
+                                    HorizontalOptions="End"/>
+                        </HorizontalStackLayout>
+                        <Label Text="⏳ 云备份功能即将上线（iCloud/OneDrive）"
+                               FontSize="11"
+                               TextColor="#999999"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 备份管理 -->
+            <Frame BorderColor="#E0E0E0" Padding="15" HasShadow="False">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="备份管理"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    
+                    <Label Text="{Binding BackupCount, StringFormat='本地备份数量：{0}'}"
+                           FontSize="13"/>
+                    
+                    <Button Text="🧹 清理旧备份"
+                            BackgroundColor="#FF9500"
+                            Command="{Binding CleanupOldBackupsCommand}"
+                            HorizontalOptions="Fill"
+                            Margin="0,10,0,0"/>
+                    
+                    <Label Text="保留最近 3 个备份，删除旧备份以释放空间"
+                           FontSize="11"
+                           TextColor="#999999"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+            <!-- 注意事项 -->
+            <Frame BackgroundColor="#FFF3CD" 
+                   Padding="15" 
+                   HasShadow="False"
+                   BorderColor="#FFC107"
+                   Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="⚠️ 注意事项"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#856404"/>
+                    <Label Text="• 恢复操作会覆盖当前所有数据，请谨慎操作"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                    <Label Text="• 备份文件存储在应用数据目录"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                    <Label Text="• 卸载应用会删除所有备份，请定期导出到外部存储"
+                           FontSize="12"
+                           TextColor="#856404"/>
+                </VerticalStackLayout>
+            </Frame>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

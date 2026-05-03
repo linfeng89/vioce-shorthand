@@ -17,4 +17,9 @@ public partial class SettingsPage : ContentPage
     {
         await Navigation.PushAsync(new QuickRecordSettingsPage());
     }
+    
+    private async void OnBackupSettingsTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new BackupSettingsPage(App.Services.GetRequiredService<BackupSettingsViewModel>()));
+    }
 }

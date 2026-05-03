@@ -46,13 +46,9 @@ public static class MauiProgram
         services.AddSingleton<IBackupService, BackupService>();
         services.AddSingleton<IExportService, ExportService>();
         services.AddSingleton<IBiometricAuthService, BiometricAuthService>();
-        services.AddSingleton<ITranscriptionQueueService, TranscriptionQueueService>();
-        services.AddSingleton<ISearchService, SearchService>();
-        services.AddSingleton<IToastService, ToastService>();
-        services.AddSingleton<ITrashService, TrashService>();
-        services.AddSingleton<IAppLockManager, AppLockManager>();
-        services.AddSingleton<INotificationService, AndroidNotificationService>();
-        services.AddSingleton<IQuickRecordService, QuickRecordService>();
+        
+        // 注册自动备份服务
+        services.AddSingleton<AutomaticBackupService>();
     }
 
     private static void RegisterViewModels(IServiceCollection services)
@@ -65,6 +61,7 @@ public static class MauiProgram
         services.AddTransient<SearchViewModel>();
         services.AddTransient<SecuritySettingsViewModel>();
         services.AddTransient<LockScreenViewModel>();
+        services.AddTransient<BackupSettingsViewModel>();
     }
 
     private static void RegisterPages(IServiceCollection services)
@@ -77,5 +74,6 @@ public static class MauiProgram
         services.AddTransient<SearchPage>();
         services.AddTransient<SecuritySettingsPage>();
         services.AddTransient<QuickRecordSettingsPage>();
+        services.AddTransient<BackupSettingsPage>();
     }
 }

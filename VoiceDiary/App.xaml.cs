@@ -51,6 +51,10 @@ public partial class App : Application
             // 初始化回收站自动清理
             var trashService = _serviceProvider.GetRequiredService<ITrashService>();
             await trashService.AutoCleanupAsync(30);
+            
+            // 启动自动备份
+            var automaticBackup = _serviceProvider.GetRequiredService<AutomaticBackupService>();
+            automaticBackup.Start();
         }
         catch (Exception ex)
         {
