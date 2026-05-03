@@ -9,6 +9,7 @@ public partial class DiaryDetailViewModel : BaseViewModel
     private readonly IToastService _toastService;
     private readonly IAppLockManager _appLockManager;
     private readonly IBiometricAuthService _biometricService;
+    private readonly IExportService _exportService;
 
     private DiaryEntry? _entry;
     private bool _isPlaying;
@@ -24,7 +25,8 @@ public partial class DiaryDetailViewModel : BaseViewModel
         ITrashService trashService,
         IToastService toastService,
         IAppLockManager appLockManager,
-        IBiometricAuthService biometricService)
+        IBiometricAuthService biometricService,
+        IExportService exportService)
     {
         _storageService = storageService;
         _databaseService = databaseService;
@@ -33,6 +35,7 @@ public partial class DiaryDetailViewModel : BaseViewModel
         _toastService = toastService;
         _appLockManager = appLockManager;
         _biometricService = biometricService;
+        _exportService = exportService;
 
         _audioPlayer.PlaybackProgressChanged += OnPlaybackProgressChanged;
         _audioPlayer.PlaybackCompleted += OnPlaybackCompleted;
@@ -107,6 +110,7 @@ public partial class DiaryDetailViewModel : BaseViewModel
     public Command CancelEditCommand => new Command(() => CancelEdit());
     public Command SaveEditCommand => new Command(async () => await SaveEditAsync());
     public Command DeleteCommand => new Command(async () => await DeleteAsync());
+    public Command ExportCommand => new Command(async () => await ExportAsync());
     public Command SeekCommand => new Command<double>(async (position) => await SeekAsync(position));
     public Command VerifyAccessCommand => new Command(async () => await VerifyAccessAsync());
 
@@ -330,6 +334,66 @@ public partial class DiaryDetailViewModel : BaseViewModel
         catch (Exception ex)
         {
             Console.WriteLine($"Verify access error: {ex}");
+        }
+    }
+    
+    private async Task ExportAsync()
+    {
+        if (Entry == null)
+            return;
+        
+        try
+        {
+            // 显示导出格式选择
+            var format = await Shell.Current.DisplayActionSheet(
+                "选择导出格式",
+                "取消",
+                null,
+                "纯文本 (TXT)",
+                "Markdown (MD)",
+                "JSON");
+            
+            if (format == "取消")
+                return;
+            
+            var exportFormat = format switch
+            {
+                "纯文本 (TXT)" => ExportFormat.Text,
+                "Markdown (MD)" => ExportFormat.Markdown,
+                "JSON" => ExportFormat.Json,
+                _ => throw new ArgumentException("不支持的格式")
+            };
+            
+            // 导出内容
+            var content = exportFormat switch
+            {
+                ExportFormat.Text => await _exportService.ExportToTextAsync(Entry),
+                ExportFormat.Markdown => await _exportService.ExportToMarkdownAsync(Entry),
+                ExportFormat.Json => await _exportService.ExportToJsonAsync(Entry),
+                _ => throw new ArgumentException("不支持的格式")
+            };
+            
+            // 显示分享或保存选项
+            var action = await Shell.Current.DisplayActionSheet(
+                "导出成功，选择操作",
+                "取消",
+                null,
+                "分享到其他应用",
+                format == "纯文本 (TXT)" || format == "Markdown (MD)" ? "复制文本" : null);
+            
+            if (action == "分享到其他应用")
+            {
+                await _exportService.ShareAsync(content, Entry.Title);
+            }
+            else if (action == "复制文本")
+            {
+                await Clipboard.SetTextAsync(content);
+                await _toastService.Show("已复制到剪贴板", 2000);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("导出失败", ex.Message, "确定");
         }
     }
 }

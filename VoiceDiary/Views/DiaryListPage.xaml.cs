@@ -14,7 +14,7 @@ public partial class DiaryListPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (_viewModel.Entries.Count == 0)
+        if (_viewModel.DiaryEntries.Count == 0)
         {
             await _viewModel.LoadEntriesCommand.ExecuteAsync(null);
         }

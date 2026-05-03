@@ -106,12 +106,19 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- 删除按钮 -->
-            <Button Text="删除日记"
-                    BackgroundColor="#F44336"
-                    Command="{Binding DeleteCommand}"
-                    HorizontalOptions="Fill"
-                    Margin="0,20,0,0"/>
+            <!-- 导出和删除按钮 -->
+            <HorizontalStackLayout Spacing="10" Margin="0,20,0,0">
+                <Button Text="📤 导出"
+                        BackgroundColor="#007AFF"
+                        Command="{Binding ExportCommand}"
+                        HorizontalOptions="FillAndExpand"
+                        HorizontalTextAlignment="Center"/>
+                <Button Text="🗑️ 删除"
+                        BackgroundColor="#F44336"
+                        Command="{Binding DeleteCommand}"
+                        HorizontalOptions="FillAndExpand"
+                        HorizontalTextAlignment="Center"/>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

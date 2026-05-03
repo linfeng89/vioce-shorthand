@@ -17,26 +17,27 @@
                IsVisible="{Binding CurrentMonth, Converter={StaticResource StringToBoolConverter}}"/>
 
         <!-- 日记列表 -->
-        <CollectionView ItemsSource="{Binding Entries}"
-                        SelectionMode="None"
+        <CollectionView ItemsSource="{Binding DiaryEntries}"
+                        SelectionMode="Multiple"
+                        SelectedItems="{Binding SelectedEntries}"
                         RemainingItemsThreshold="5"
                         RemainingItemsThresholdReached="OnThresholdReached"
                         Margin="10,60,10,80">
             
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <SwipeView>
-                        <SwipeView.RightItems>
-                            <SwipeItems>
-                                <SwipeItem Text="删除" 
-                                           BackgroundColor="Red"
-                                           ForegroundColor="White"
-                                           CommandParameter="{Binding .}"
-                                           Invoked="OnSwipeToDelete"/>
-                            </SwipeItems>
-                        </SwipeView.RightItems>
-                        
-                        <ContentView Padding="15,10">
+                    <ContentView>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="删除" 
+                                               BackgroundColor="Red"
+                                               ForegroundColor="White"
+                                               CommandParameter="{Binding .}"
+                                               Invoked="OnSwipeToDelete"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            
                             <Frame Padding="15" Margin="0,5" HasShadow="False" BorderColor="#E0E0E0">
                                 <VerticalStackLayout Spacing="8">
                                     <!-- 时间段和时长 -->
@@ -59,8 +60,8 @@
                                            TextColor="#333333"/>
                                 </VerticalStackLayout>
                             </Frame>
-                        </ContentView>
-                    </SwipeView>
+                        </SwipeView>
+                    </ContentView>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             
@@ -86,7 +87,8 @@
         <HorizontalStackLayout HorizontalOptions="Center" 
                                VerticalOptions="End" 
                                Spacing="20"
-                               Margin="0,0,0,20">
+                               Margin="0,0,0,20"
+                               IsVisible="{Binding IsNotInSelectionMode}">
             
             <!-- 搜索按钮 -->
             <Frame WidthRequest="60" 
@@ -139,5 +141,31 @@
                 </Frame.GestureRecognizers>
             </Frame>
         </HorizontalStackLayout>
+        
+        <!-- 批量操作工具栏 -->
+        <ContentView BackgroundColor="#F5F5F5"
+                     Padding="15"
+                     IsVisible="{Binding IsInSelectionMode}"
+                     VerticalOptions="End">
+            <HorizontalStackLayout Spacing="15">
+                <Label Text="{Binding SelectedEntries.Count, StringFormat='已选择 {0} 篇'}"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       HorizontalOptions="FillAndExpand"/>
+                <Button Text="导出所选"
+                        BackgroundColor="#007AFF"
+                        TextColor="White"
+                        Command="{Binding ExportSelectedCommand}"
+                        HeightRequest="44"
+                        Padding="20,0"/>
+                <Button Text="取消"
+                        BackgroundColor="#E0E0E0"
+                        TextColor="Black"
+                        Command="{Binding CancelSelectionCommand}"
+                        HeightRequest="44"
+                        WidthRequest="80"/>
+            </HorizontalStackLayout>
+        </ContentView>
     </Grid>
 </ContentPage>
