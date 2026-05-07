@@ -21,15 +21,38 @@
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<!-- Target SDK versions -->
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">13.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</TargetPlatformMinVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">13.0</TargetPlatformMinVersion>
 		
-		<!-- Android Permissions -->
-		<AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
-		<AndroidManifest>Platforms/Android/AndroidManifest.xml</AndroidManifest>
+		<!-- Android SDK Configuration (Windows 10 22H2) -->
+		<AndroidSdkDirectory>$(USERPROFILE)\Android\Sdk</AndroidSdkDirectory>
+		<AndroidNdkDirectory>$(USERPROFILE)\Android\Sdk\ndk\25.2.9519653</AndroidNdkDirectory>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<AndroidSupportedAbis>armeabi-v7a;arm64-v8a;x86;x86_64</AndroidSupportedAbis>
+		<AndroidUseAapt2>true</AndroidUseAapt2>
+		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+		<EmbeddedAssembliesUseApkFormat>true</EmbeddedAssembliesUseApkFormat>
+		<AndroidDexTool>d8</AndroidDexTool>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+		<AndroidEnableSGenConc>true</AndroidEnableSGenConc>
+		<AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+		<AndroidEnableFastDeployment>False</AndroidEnableFastDeployment>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		
+		<!-- iOS SDK Configuration (requires macOS) -->
+		<MtouchEnableAssemblyValidation>false</MtouchEnableAssemblyValidation>
+		<UseInterpreter Condition="$(TargetFramework.Contains('-ios'))">true</UseInterpreter>
+		<RuntimeIdentifier Condition="$(TargetFramework.Contains('-ios'))">ios-arm64</RuntimeIdentifier>
+		
+		<!-- Windows Configuration -->
+		<WindowsPackageType>None</WindowsPackageType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
